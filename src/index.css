@@ -1,0 +1,232 @@
+body, html {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+body {
+  background-color: white;
+  color: #23282e;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+nav ul li:not(:first-child) {
+  float: right;
+}
+
+nav ul li:first-child {
+  float: left;
+}
+
+nav ul li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 10px 12px;
+  margin: 5px;
+  text-decoration: none;
+}
+
+nav ul li a:hover {
+  background-color: #111;
+  color: white;
+  border-radius: 5px;
+}
+
+.logout {
+  margin-top: 7px;
+  margin-right: 10px;
+}
+
+.auth-form {
+  position: fixed;
+  background-color: #273c75;
+  color: white;
+  border-radius: 7px;
+  width: 400px;
+  left: 50%;
+  top: 25%;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.auth-form > * {
+  width: 100%;
+  text-align: center;
+  margin: 1em;
+}
+
+.auth-form form > * {
+  margin: 10px auto;
+}
+
+.auth-link {
+  color: white;
+  font-weight: bold;
+}
+
+.auth-link:hover {
+  color: white;
+}
+
+.dashboard h2 {
+  text-align: center;
+  width: 100%;
+}
+
+.form-popup {
+  position: fixed;
+  background-color: white;
+  width: 400px;
+  left: 50%;
+  top: 25%;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border-radius: 7px;
+  padding: 1em;
+  border: 1px solid #0984e3;
+}
+
+.form-popup > * {
+  width: 90%;
+  margin: 10px auto;
+}
+
+.dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888 ;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.info-panel {
+  width: 100%;
+  height: 100%;
+  background-color: #dfe6e9;
+  border-left: 5px solid #0984e3;
+  border-radius: 5px;
+  overflow-y: scroll;
+  direction:rtl;
+}
+
+.info-panel > * {
+  direction:ltr;
+}
+
+.info-panel h3 {
+  text-align: center;
+}
+
+.stack {
+  position: absolute;
+  height: 80%;
+  bottom: 1em;
+  left: 1em;
+  right: 1em;
+}
+
+@media (max-width: 600px) {
+  .form-popup {
+    position: fixed;
+    background-color: white;
+    width: 300px;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, 0);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 7px;
+    padding: 1em;
+    border: 1px solid #0984e3;
+  }
+}
+
+@media (max-height: 650px) { 
+  .stack {
+    position: absolute;
+    height: 70%;
+    bottom: 1em;
+    left: 1em;
+    right: 1em;
+  }
+}
+
+@media (max-height: 400px) { 
+  .stack {
+    position: absolute;
+    height: 60%;
+    bottom: 1em;
+    left: 1em;
+    right: 1em;
+  }
+}
+
+@media (max-height: 300px) { 
+  .stack {
+    position: absolute;
+    height: 40%;
+    bottom: 1em;
+    left: 1em;
+    right: 1em;
+  }
+}
+
+.folders {
+  margin-bottom: 10px;
+  overflow-y: scroll;
+  padding: 10px;
+  border: 1px solid #0984e3;
+  border-radius: 5px;
+}
+
+.forlders-panel {
+  width: 30%;
+}
+
+.folders-controls {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+}
+
