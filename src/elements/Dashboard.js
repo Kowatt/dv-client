@@ -97,6 +97,39 @@ const Dashboard = () => {
         })()
     })
 
+
+    async function addCard(event) {
+        event.preventDefault()
+
+        if (currentFolder.id === null) {
+            setCardFormState(false)
+            return
+        }
+
+        const formData = new FormData(event.currentTarget)
+        const name = formData.get("card_name")
+        const number = formData.get("card_number")
+        const date = formData.get("card_date")
+        const ccv = formData.get("card_ccv")
+        const req = await fetch('http://localhost:4000/api/add/data/card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                name: name,
+                number: number,
+                date: date,
+                ccv: ccv,
+                folder: currentFolder.id
+            })
+        })
+
+        const data = await req.json()
+        if (data.status === 'ok') setCardFormState(false)
+    }
+
     async function addFolder(event) {
         event.preventDefault()
         const req = await fetch('http://localhost:4000/api/add/folder', {
@@ -182,16 +215,16 @@ const Dashboard = () => {
                     <Typography component="h2" variant="h5">
                         Add Credit card
                     </Typography>
-                    <Box component="form" noValidate sx={{ mt: 1 }}>
+                    <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={addCard}>
                         <TextField margin="normal" required fullWidth id="card_name" label="Data Name" name="card_name" autoFocus/>
                         <TextField margin="normal" required fullWidth id="card_number" label="Card number" name="card_number"/>
                         <TextField margin="normal" required fullWidth id="card_date" label="Card date" name="card_date"/>
                         <TextField margin="normal" required fullWidth id="card_ccv" label="Card CCV" name="card_ccv"/>
+                        <Stack direction="row" spacing={1} style={{flex : 0}}>
+                            <Button variant="contained" color="success" fullWidth type="submit">Add</Button>
+                            <Button onClick={() => {setCardFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
+                        </Stack>
                     </Box>
-                    <Stack direction="row" spacing={1} style={{flex : 0}}>
-                        <Button variant="contained" color="success" fullWidth>Add</Button>
-                        <Button onClick={() => {setCardFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
-                    </Stack>
                 </FormPopup>
 
                 <FormPopup trigger={passFormState} setTrigger={setPassFormState}>
