@@ -3,38 +3,19 @@ import decoder from "jwt-decode"
 import { useNavigate } from "react-router-dom"
 import Navbar from "./Navbar"
 
-const LoginTest = () => {
+const Component = () => {
 
-    const navigate = useNavigate()
-
-    const [username, setUsername] = useState("")
-
-    useEffect(() => {
-        function retreiveUsername() {
-            const token = localStorage.getItem('token')
-            console.log(token)
-            if (token) {
-                const user = decoder(token)
-                if (!user) {
-                    localStorage.removeItem('token')
-                    navigate('/login')
-                } else {
-                    setUsername(user.username)
-                }
-            } else {
-                navigate('/login')
-            }
-        }
-        retreiveUsername()
-    })
+    const [username, setUsername] = useState("Default Value")
 
     return (
         <div>
             <Navbar />
             <h1>Test page</h1>
             <h2>Welcome {username} </h2>
+            <button onClick={() => {console.log("I clicked on the button !")}}>Click</button>
+            <button onClick={() => {setUsername("Username changed !")}}>Change username</button>
         </div>
     )
 }
 
-export default LoginTest
+export default Component

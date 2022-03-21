@@ -13,6 +13,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import { Container } from "@mui/material"
 
 const Dashboard = () => {
 
@@ -27,6 +28,10 @@ const Dashboard = () => {
     const [cardFormState, setCardFormState] = useState(false)
     const [passFormState, setPassFormState] = useState(false)
     const [noteFormState, setNoteFormState] = useState(false)
+
+    const [cards, setCards] = useState([])
+    const [pass, setPass] = useState([])
+    const [notes, setNotes] = useState([])
 
     const emptyFolder = {
         title: "No folder selected",
@@ -44,6 +49,51 @@ const Dashboard = () => {
             }
         })
         
+        return await req.json()
+    }
+
+    async function retreiveCards() {
+        const req = await fetch('http://localhost:4000/api/get/data/cards', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                folder: currentFolder.id
+            })
+        })
+
+        return await req.json()
+    }
+
+    async function retreivePass() {
+        const req = await fetch('http://localhost:4000/api/get/data/pass', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                folder: currentFolder.id
+            })
+        })
+
+        return await req.json()
+    }
+
+    async function retreiveNotes() {
+        const req = await fetch('http://localhost:4000/api/get/data/notes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                folder: currentFolder.id
+            })
+        })
+
         return await req.json()
     }
 
@@ -74,11 +124,45 @@ const Dashboard = () => {
         })
     }
 
+    
+    function updateData() {
+        retreiveCards().then(data => {
+            setCards(data)
+        })
+        retreiveCards().then(data => {
+            setCards(data)
+        })
+        retreiveNotes().then(data => {
+            setNotes(data)
+        })
+    }
+
     useEffect(() => {
         retreiveFolders().then(data => {
             setFolders(data)
         })
     }, [])
+
+    useEffect(() => {
+        if (currentFolder.id) {
+            retreiveCards().then(data => {
+                if (data) {
+                    setCards(data)
+                }
+            })
+            retreivePass().then(data => {
+                if (data) {
+                    setPass(data)
+                }
+            })
+            retreiveNotes().then(data => {
+                if (data) {
+                    setNotes(data)
+                }
+            })
+        }
+    }, [currentFolder])
+
 
     useEffect(() => {
         (function retreiveUsername() {
@@ -127,7 +211,78 @@ const Dashboard = () => {
         })
 
         const data = await req.json()
-        if (data.status === 'ok') setCardFormState(false)
+        if (data.status === 'ok') {
+            setCardFormState(false)
+            updateData()
+        }
+    }
+
+    async function addPass(event) {
+        event.preventDefault()
+
+        if (currentFolder.id === null) {
+            setPassFormState(false)
+            return
+        }
+
+        const formData = new FormData(event.currentTarget)
+        const name = formData.get("pass_name")
+        const url = formData.get("pass_url")
+        const user = formData.get("pass_user")
+        const pass = formData.get("pass")
+        const req = await fetch('http://localhost:4000/api/add/data/pass', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                name: name,
+                url: url,
+                user: user,
+                pass: pass,
+                folder: currentFolder.id
+            })
+        })
+
+        const data = await req.json()
+        if (data.status === 'ok') {
+            setPassFormState(false)
+            updateData()
+        }
+    }
+
+    async function addNote(event) {
+        event.preventDefault()
+
+        if (currentFolder.id === null) {
+            setNoteFormState(false)
+            return
+        }
+
+        const formData = new FormData(event.currentTarget)
+        const name = formData.get("note_name")
+        const title = formData.get("note_title")
+        const note = formData.get("note")
+        const req = await fetch('http://localhost:4000/api/add/data/note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                name: name,
+                title: title,
+                note: note,
+                folder: currentFolder.id
+            })
+        })
+
+        const data = await req.json()
+        if (data.status === 'ok') {
+            setNoteFormState(false)
+            updateData()
+        }
     }
 
     async function addFolder(event) {
@@ -163,6 +318,18 @@ const Dashboard = () => {
         )
     )
 
+    const cardsList = cards.map (
+        (card) => (<Button key={card._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}}><CreditCardIcon />&nbsp;{card.name}</Button>)
+    )
+
+    const passList = pass.map (
+        (passI) => (<Button key={passI._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}}><VpnKeyIcon />&nbsp;{passI.name}</Button>)
+    )
+
+    const notesList = notes.map (
+        (note) => (<Button key={note._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}}><VpnKeyIcon />&nbsp;{note.name}</Button>)
+    )
+
     return (
         <div>
             <Navbar />
@@ -177,9 +344,23 @@ const Dashboard = () => {
                     </Stack>
                     <div className="info-panel">
                         <h3>{currentFolder.title}</h3>
-                        <Stack direction="column">
-
-                        </Stack>
+                        <Container className="dashboard-data">
+                            <Typography component="h2" variant="h5">
+                                <CreditCardIcon />
+                                Bank Cards
+                            </Typography>
+                            {cardsList}
+                            <Typography component="h2" variant="h5">
+                                <VpnKeyIcon />
+                                Passwords
+                            </Typography>
+                            {passList}
+                            <Typography component="h2" variant="h5">
+                                <TextSnippetIcon />
+                                Notes
+                            </Typography>
+                            {notesList}
+                        </Container>
                         <Stack direction="column" spacing={1} className="folders-controls">
                             <Button variant="contained" color="error" size="small" fullWidth onClick={() => {if (currentFolder.id) setDeletePopupState(true)}}><DeleteForeverIcon /></Button>
                             <Button variant="contained" size="small" fullWidth onClick={() => {setCardFormState(true)}}>+&nbsp;<CreditCardIcon /></Button>
@@ -231,31 +412,31 @@ const Dashboard = () => {
                     <Typography component="h2" variant="h5">
                         Add Password
                     </Typography>
-                    <Box component="form" noValidate sx={{ mt: 1 }}>
+                    <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={addPass}>
                         <TextField margin="normal" required fullWidth id="pass_name" label="Data Name" name="pass_name" autoFocus/>
                         <TextField margin="normal" required fullWidth id="pass_url" label="Website URL" name="pass_url"/>
                         <TextField margin="normal" required fullWidth id="pass_user" label="Username" name="pass_user"/>
                         <TextField margin="normal" required fullWidth id="pass" label="Password" name="pass"/>
+                        <Stack direction="row" spacing={1} style={{flex : 0}}>
+                            <Button variant="contained" color="success" fullWidth type="submit">Add</Button>
+                            <Button onClick={() => {setPassFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
+                        </Stack>
                     </Box>
-                    <Stack direction="row" spacing={1} style={{flex : 0}}>
-                        <Button variant="contained" color="success" fullWidth>Add</Button>
-                        <Button onClick={() => {setPassFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
-                    </Stack>
                 </FormPopup>
 
                 <FormPopup trigger={noteFormState} setTrigger={setNoteFormState}>
                     <Typography component="h2" variant="h5">
                         Add Note
                     </Typography>
-                    <Box component="form" noValidate sx={{ mt: 1 }}>
+                    <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={addNote}>
                         <TextField margin="normal" required fullWidth id="note_name" label="Data Name" name="note_name" autoFocus/>
                         <TextField margin="normal" required fullWidth id="note_title" label="Note title" name="note_title"/>
                         <TextField margin="normal" required fullWidth id="note" label="Note" name="note"/>
+                        <Stack direction="row" spacing={1} style={{flex : 0}}>
+                            <Button variant="contained" color="success" fullWidth type="submit">Add</Button>
+                            <Button onClick={() => {setNoteFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
+                        </Stack>
                     </Box>
-                    <Stack direction="row" spacing={1} style={{flex : 0}}>
-                        <Button variant="contained" color="success" fullWidth>Add</Button>
-                        <Button onClick={() => {setNoteFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
-                    </Stack>
                 </FormPopup>
             </div>
         </div>
