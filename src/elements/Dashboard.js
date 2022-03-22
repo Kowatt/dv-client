@@ -33,6 +33,45 @@ const Dashboard = () => {
     const [pass, setPass] = useState([])
     const [notes, setNotes] = useState([])
 
+    const [showCardForm, setShowCardForm] = useState(false)
+    const [showPassForm, setShowPassForm] = useState(false)
+    const [showNoteForm, setShowNoteForm] = useState(false)
+
+    const emptyCard = {
+        _id: 0,
+        name: "-",
+        number: "-",
+        date: "-",
+        ccv: "-",
+        owner: "-",
+        folder: "-"
+    }
+
+    const emptyPass = {
+        _id: 0,
+        name: "-",
+        url: "-",
+        user: "-",
+        pass: "-",
+        owner: "-",
+        folder: "-"
+    }
+
+    const emptyNote = {
+        _id: 0,
+        name: "-",
+        title: "-",
+        note: "-",
+        owner: "-",
+        folder: "-"
+    }
+
+    const [currentCard, setCurrentCard] = useState(emptyCard)
+    const [currentPass, setCurrentPass] = useState(emptyPass)
+    const [currentNote, setCurrentNote] = useState(emptyNote)
+
+
+
     const emptyFolder = {
         title: "No folder selected",
         id: null
@@ -162,6 +201,16 @@ const Dashboard = () => {
             })
         }
     }, [currentFolder])
+
+    function generatePassword() {
+        var length = 8,
+            charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+            retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return retVal;
+    }
 
 
     useEffect(() => {
@@ -319,15 +368,15 @@ const Dashboard = () => {
     )
 
     const cardsList = cards.map (
-        (card) => (<Button key={card._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}}><CreditCardIcon />&nbsp;{card.name}</Button>)
+        (card) => (<Button key={card._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}} onClick={() => {setCurrentCard(cards.find(item => item._id === card._id)); setShowCardForm(true)}}><CreditCardIcon />&nbsp;{card.name}</Button>)
     )
 
     const passList = pass.map (
-        (passI) => (<Button key={passI._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}}><VpnKeyIcon />&nbsp;{passI.name}</Button>)
+        (passI) => (<Button key={passI._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}} onClick={() => {setCurrentPass(pass.find(item => item._id === passI._id)); setShowPassForm(true)}}><VpnKeyIcon />&nbsp;{passI.name}</Button>)
     )
 
     const notesList = notes.map (
-        (note) => (<Button key={note._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}}><VpnKeyIcon />&nbsp;{note.name}</Button>)
+        (note) => (<Button key={note._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}} onClick={() => {setCurrentNote(notes.find(item => item._id === note._id)); setShowNoteForm(true)}}><VpnKeyIcon />&nbsp;{note.name}</Button>)
     )
 
     return (
@@ -437,6 +486,49 @@ const Dashboard = () => {
                             <Button onClick={() => {setNoteFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
                         </Stack>
                     </Box>
+                </FormPopup>
+
+                <FormPopup trigger={showCardForm} setTrigger={setShowCardForm}>
+                    <Typography component="h4" variant="h5">
+                        {currentCard.name}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentCard.number}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentCard.date}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentCard.ccv}
+                    </Typography>
+                    <Button onClick={() => {setShowCardForm(false)}} variant="contained" color="error">Close</Button>
+                </FormPopup>
+                <FormPopup trigger={showPassForm} setTrigger={setShowPassForm}>
+                    <Typography component="h4" variant="h5">
+                        {currentPass.name}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentPass.url}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentPass.user}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentPass.pass}
+                    </Typography>
+                    <Button onClick={() => {setShowPassForm(false)}} variant="contained" color="error">Close</Button>
+                </FormPopup>
+                <FormPopup trigger={showNoteForm} setTrigger={setShowNoteForm}>
+                    <Typography component="h4" variant="h5">
+                        {currentNote.name}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentNote.title}
+                    </Typography>
+                    <Typography component="h4" variant="h5">
+                        {currentNote.note}
+                    </Typography>
+                    <Button onClick={() => {setShowNoteForm(false)}} variant="contained" color="error">Close</Button>
                 </FormPopup>
             </div>
         </div>
