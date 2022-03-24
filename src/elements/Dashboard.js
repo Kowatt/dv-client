@@ -166,13 +166,16 @@ const Dashboard = () => {
     
     function updateData() {
         retreiveCards().then(data => {
-            setCards(data)
+            if (!data.error)
+                setCards(data)
         })
         retreiveCards().then(data => {
-            setCards(data)
+            if (!data.error)
+                setCards(data)
         })
         retreiveNotes().then(data => {
-            setNotes(data)
+            if (!data.error)
+                setNotes(data)
         })
     }
 
@@ -185,19 +188,16 @@ const Dashboard = () => {
     useEffect(() => {
         if (currentFolder.id) {
             retreiveCards().then(data => {
-                if (data) {
+                if (!data.error)
                     setCards(data)
-                }
             })
             retreivePass().then(data => {
-                if (data) {
+                if (!data.error) 
                     setPass(data)
-                }
             })
             retreiveNotes().then(data => {
-                if (data) {
+                if (!data.error)
                     setNotes(data)
-                }
             })
         }
     }, [currentFolder])
