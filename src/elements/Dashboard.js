@@ -13,7 +13,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import { Container } from "@mui/material"
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import CachedIcon from '@mui/icons-material/Cached';
 
 const Dashboard = () => {
 
@@ -70,7 +71,7 @@ const Dashboard = () => {
     const [currentPass, setCurrentPass] = useState(emptyPass)
     const [currentNote, setCurrentNote] = useState(emptyNote)
 
-
+    const [passwordValue, setPasswordValue] = useState("")
 
     const emptyFolder = {
         title: "No folder selected",
@@ -154,6 +155,9 @@ const Dashboard = () => {
             setDeletePopupState(false)
             setCurrentFolder(emptyFolder)
             updateFolders()
+            setCards([])
+            setPass([])
+            setNotes([])
         }
     }
 
@@ -169,9 +173,9 @@ const Dashboard = () => {
             if (!data.error)
                 setCards(data)
         })
-        retreiveCards().then(data => {
+        retreivePass().then(data => {
             if (!data.error)
-                setCards(data)
+                setPass(data)
         })
         retreiveNotes().then(data => {
             if (!data.error)
@@ -203,8 +207,8 @@ const Dashboard = () => {
     }, [currentFolder])
 
     function generatePassword() {
-        var length = 8,
-            charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        var length = 12,
+            charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;:,@!&(-_)=+.?",
             retVal = "";
         for (var i = 0, n = charset.length; i < length; ++i) {
             retVal += charset.charAt(Math.floor(Math.random() * n));
@@ -278,7 +282,7 @@ const Dashboard = () => {
         const name = formData.get("pass_name")
         const url = formData.get("pass_url")
         const user = formData.get("pass_user")
-        const pass = formData.get("pass")
+        const pass = passwordValue
         const req = await fetch('http://localhost:4000/api/add/data/pass', {
             method: 'POST',
             headers: {
@@ -296,6 +300,7 @@ const Dashboard = () => {
 
         const data = await req.json()
         if (data.status === 'ok') {
+            setPasswordValue("")
             setPassFormState(false)
             updateData()
         }
@@ -376,14 +381,44 @@ const Dashboard = () => {
     )
 
     const notesList = notes.map (
-        (note) => (<Button key={note._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}} onClick={() => {setCurrentNote(notes.find(item => item._id === note._id)); setShowNoteForm(true)}}><VpnKeyIcon />&nbsp;{note.name}</Button>)
+        (note) => (<Button key={note._id} variant="outlined" sx={{ margin: 1, justifyContent: "flex-start"}} onClick={() => {setCurrentNote(notes.find(item => item._id === note._id)); setShowNoteForm(true)}}><TextSnippetIcon />&nbsp;{note.name}</Button>)
     )
+
+    function RenderActionBar(props) {
+        const shouldRender = props.shouldRender
+
+        if (shouldRender) {
+            return (
+                <Stack direction="column" spacing={1} className="folders-controls">
+                    <Button variant="contained" color="error" size="small" fullWidth onClick={() => {if (currentFolder.id) setDeletePopupState(true)}}><DeleteForeverIcon /></Button>
+                    <Button variant="contained" size="small" fullWidth onClick={() => {setCardFormState(true)}}>+&nbsp;<CreditCardIcon /></Button>
+                    <Button variant="contained" size="small" fullWidth onClick={() => {setPassFormState(true)}}>+&nbsp;<VpnKeyIcon /></Button>
+                    <Button variant="contained" size="small" fullWidth onClick={() => {setNoteFormState(true)}}>+&nbsp;<TextSnippetIcon /></Button>
+                </Stack>
+            )
+        }
+        return <div></div>
+    }
+
+    function handleLink() {
+        if (!currentPass.url.startsWith("http://")) {
+            window.open("http://" + currentPass.url)
+        } else {
+            window.open(currentPass.url)
+        }
+    }
+
+    function handleGeneratePass() {
+        setPasswordValue(generatePassword())
+    }
 
     return (
         <div>
             <Navbar />
             <div className="dashboard">
-                <h2>{username}'s dashboard</h2>
+                <Typography component="h4" variant="h4">
+                    {username}'s dashboard
+                </Typography>
                 <Stack direction="row" spacing={1} className="stack">
                     <Stack direction="column" spacing={1} className="folders-panel">
                         <Stack direction="column" spacing={1} className="folders">
@@ -392,30 +427,15 @@ const Dashboard = () => {
                         <Button onClick={() => {setStateButton(true)}} variant="outlined" className="add-button" size="large" fullWidth><AddIcon /></Button>
                     </Stack>
                     <div className="info-panel">
-                        <h3>{currentFolder.title}</h3>
-                        <Container className="dashboard-data">
-                            <Typography component="h2" variant="h5">
-                                <CreditCardIcon />
-                                Bank Cards
-                            </Typography>
+                        <Typography component="h4" variant="h4" sx={{textAlign: "center"}}>
+                            {currentFolder.title}
+                        </Typography>
+                        <Stack direction="column">
                             {cardsList}
-                            <Typography component="h2" variant="h5">
-                                <VpnKeyIcon />
-                                Passwords
-                            </Typography>
                             {passList}
-                            <Typography component="h2" variant="h5">
-                                <TextSnippetIcon />
-                                Notes
-                            </Typography>
                             {notesList}
-                        </Container>
-                        <Stack direction="column" spacing={1} className="folders-controls">
-                            <Button variant="contained" color="error" size="small" fullWidth onClick={() => {if (currentFolder.id) setDeletePopupState(true)}}><DeleteForeverIcon /></Button>
-                            <Button variant="contained" size="small" fullWidth onClick={() => {setCardFormState(true)}}>+&nbsp;<CreditCardIcon /></Button>
-                            <Button variant="contained" size="small" fullWidth onClick={() => {setPassFormState(true)}}>+&nbsp;<VpnKeyIcon /></Button>
-                            <Button variant="contained" size="small" fullWidth onClick={() => {setNoteFormState(true)}}>+&nbsp;<TextSnippetIcon /></Button>
                         </Stack>
+                        <RenderActionBar shouldRender={currentFolder.id} />
                     </div>
                 </Stack>
                 <FormPopup trigger={stateButton} setTrigger={setStateButton}>
@@ -465,10 +485,13 @@ const Dashboard = () => {
                         <TextField margin="normal" required fullWidth id="pass_name" label="Data Name" name="pass_name" autoFocus/>
                         <TextField margin="normal" required fullWidth id="pass_url" label="Website URL" name="pass_url"/>
                         <TextField margin="normal" required fullWidth id="pass_user" label="Username" name="pass_user"/>
-                        <TextField margin="normal" required fullWidth id="pass" label="Password" name="pass"/>
+                        <Stack direction="row">
+                            <TextField sx={{marginBottom: "1em"}} required fullWidth label="Password" value={passwordValue} onChange={(e) => {setPasswordValue(e.target.value)}}/>
+                            <Button variant="contained" sx={{marginLeft: "1em", marginBottom: "1em"}} onClick={handleGeneratePass}><CachedIcon /></Button>
+                        </Stack>
                         <Stack direction="row" spacing={1} style={{flex : 0}}>
                             <Button variant="contained" color="success" fullWidth type="submit">Add</Button>
-                            <Button onClick={() => {setPassFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
+                            <Button onClick={() => {setPassFormState(false); setPasswordValue("")}} variant="contained" color="error" fullWidth>Cancel</Button> 
                         </Stack>
                     </Box>
                 </FormPopup>
@@ -480,7 +503,7 @@ const Dashboard = () => {
                     <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={addNote}>
                         <TextField margin="normal" required fullWidth id="note_name" label="Data Name" name="note_name" autoFocus/>
                         <TextField margin="normal" required fullWidth id="note_title" label="Note title" name="note_title"/>
-                        <TextField margin="normal" required fullWidth id="note" label="Note" name="note"/>
+                        <TextField margin="normal" required fullWidth multiline id="note" label="Note" name="note"/>
                         <Stack direction="row" spacing={1} style={{flex : 0}}>
                             <Button variant="contained" color="success" fullWidth type="submit">Add</Button>
                             <Button onClick={() => {setNoteFormState(false)}} variant="contained" color="error" fullWidth>Cancel</Button> 
@@ -489,45 +512,26 @@ const Dashboard = () => {
                 </FormPopup>
 
                 <FormPopup trigger={showCardForm} setTrigger={setShowCardForm}>
-                    <Typography component="h4" variant="h5">
-                        {currentCard.name}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentCard.number}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentCard.date}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentCard.ccv}
-                    </Typography>
+                    <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentCard.name}/>
+                    <TextField margin="normal" label="Card number" InputProps={{readOnly: true}} fullWidth value={currentCard.number}/>
+                    <TextField margin="normal" label="Card date" InputProps={{readOnly: true}} fullWidth value={currentCard.date}/>
+                    <TextField margin="normal" label="Card CCV" InputProps={{readOnly: true}} fullWidth value={currentCard.ccv}/>
                     <Button onClick={() => {setShowCardForm(false)}} variant="contained" color="error">Close</Button>
                 </FormPopup>
                 <FormPopup trigger={showPassForm} setTrigger={setShowPassForm}>
-                    <Typography component="h4" variant="h5">
-                        {currentPass.name}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentPass.url}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentPass.user}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentPass.pass}
-                    </Typography>
+                    <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentPass.name}/>
+                    <Stack direction="row">
+                        <TextField sx={{margin: 0}} label="Website" InputProps={{readOnly: true}} fullWidth value={currentPass.url}/>
+                        <Button variant="contained" sx={{marginLeft: "1em"}} onClick={handleLink}><ArrowCircleRightIcon /></Button>
+                    </Stack>
+                    <TextField margin="normal" label="Username" InputProps={{readOnly: true}} fullWidth value={currentPass.user}/>
+                    <TextField margin="normal" label="Password" InputProps={{readOnly: true}} fullWidth value={currentPass.pass}/>
                     <Button onClick={() => {setShowPassForm(false)}} variant="contained" color="error">Close</Button>
                 </FormPopup>
                 <FormPopup trigger={showNoteForm} setTrigger={setShowNoteForm}>
-                    <Typography component="h4" variant="h5">
-                        {currentNote.name}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentNote.title}
-                    </Typography>
-                    <Typography component="h4" variant="h5">
-                        {currentNote.note}
-                    </Typography>
+                    <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentNote.name}/>
+                    <TextField margin="normal" label="Title" InputProps={{readOnly: true}} fullWidth value={currentNote.title}/>
+                    <TextField margin="normal" multiline label="Content" InputProps={{readOnly: true}} fullWidth value={currentNote.note}/>
                     <Button onClick={() => {setShowNoteForm(false)}} variant="contained" color="error">Close</Button>
                 </FormPopup>
             </div>
