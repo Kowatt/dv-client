@@ -13,7 +13,6 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import CachedIcon from '@mui/icons-material/Cached';
 
 const Dashboard = () => {
@@ -66,6 +65,23 @@ const Dashboard = () => {
         owner: "-",
         folder: "-"
     }
+
+    const [showCardAsEditMode, setShowCardAsEditMode] = useState(false)
+    const [editCardValueName, setEditCardValueName] = useState("")
+    const [editCardValueNumber, setEditCardValueNumber] = useState("")
+    const [editCardValueDate, setEditCardValueDate] = useState("")
+    const [editCardValueCCV, setEditCardValueCCV] = useState("")
+
+    const [showPassAsEditMode, setShowPassAsEditMode] = useState(false)
+    const [editPassValueName, setEditPassValueName] = useState("")
+    const [editPassValueUrl, setEditPassValueUrl] = useState("")
+    const [editPassValueUser, setEditPassValueUser] = useState("")
+    const [editPassValuePass, setEditPassValuePass] = useState("")
+
+    const [showNoteAsEditMode, setShowNoteAsEditMode] = useState(false)
+    const [editNoteValueName, setEditNoteValueName] = useState("")
+    const [editNoteValueTitle, setEditNoteValueTitle] = useState("")
+    const [editNoteValueContent, setEditNoteValueContent] = useState("")
 
     const [currentCard, setCurrentCard] = useState(emptyCard)
     const [currentPass, setCurrentPass] = useState(emptyPass)
@@ -361,6 +377,80 @@ const Dashboard = () => {
         }
     }
 
+    async function updateCard() {
+        const req = await fetch('http://localhost:4000/api/edit/data/card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                id: currentCard._id,
+                name: editCardValueName,
+                number: editCardValueNumber,
+                date: editCardValueDate,
+                ccv: editCardValueCCV
+            })
+        })
+
+        const data = await req.json()
+
+        if (data.status === 'ok') {
+            updateData()
+            setShowCardForm(false)
+            setShowCardAsEditMode(false)
+        }
+    }
+
+    async function updatePass() {
+        const req = await fetch('http://localhost:4000/api/edit/data/pass', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                id: currentPass._id,
+                name: editPassValueName,
+                url: editPassValueUrl,
+                user: editPassValueUser,
+                pass: editPassValuePass
+            })
+        })
+
+        const data = await req.json()
+
+        if (data.status === 'ok') {
+            updateData()
+            setShowPassForm(false)
+            setShowPassAsEditMode(false)
+        }
+    }
+
+    async function updateNote() {
+        const req = await fetch('http://localhost:4000/api/edit/data/note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                id: currentNote._id,
+                name: editNoteValueName,
+                title: editNoteValueTitle,
+                note: editNoteValueContent
+            })
+        })
+
+        const data = await req.json()
+
+        if (data.status === 'ok') {
+            updateData()
+            setShowNoteForm(false)
+            setShowNoteAsEditMode(false)
+        }
+    }
+
     function handleFolderInputChange(event) {
         setFolderName(event.target.value.trim())
     }
@@ -400,12 +490,115 @@ const Dashboard = () => {
         return <div></div>
     }
 
-    function handleLink() {
-        if (!currentPass.url.startsWith("http://")) {
-            window.open("http://" + currentPass.url)
-        } else {
-            window.open(currentPass.url)
+    function handleEditCardDoubleClick() {
+        setShowCardAsEditMode(true)
+        setEditCardValueName(currentCard.name)
+        setEditCardValueDate(currentCard.date)
+        setEditCardValueNumber(currentCard.number)
+        setEditCardValueCCV(currentCard.ccv)
+    }
+
+    function handleEditPassDoubleClick() {
+        setShowPassAsEditMode(true)
+        setEditPassValueName(currentPass.name)
+        setEditPassValueUrl(currentPass.url)
+        setEditPassValueUser(currentPass.user)
+        setEditPassValuePass(currentPass.pass)
+    }
+
+    function handleEditNoteDoubleClick() {
+        setShowNoteAsEditMode(true)
+        setEditNoteValueName(currentNote.name)
+        setEditNoteValueTitle(currentNote.title)
+        setEditNoteValueContent(currentNote.note)
+    }
+
+    function RenderFormCard() {
+        if (showCardAsEditMode === false) {
+            return (
+                <FormPopup trigger={showCardForm} setTrigger={setShowCardForm}>
+                    <div onDoubleClick={handleEditCardDoubleClick}>
+                        <p>Double click on any field to enter edit mode</p>
+                        <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentCard.name}/>
+                        <TextField margin="normal" label="Card number" InputProps={{readOnly: true}} fullWidth value={currentCard.number}/>
+                        <TextField margin="normal" label="Card date" InputProps={{readOnly: true}} fullWidth value={currentCard.date}/>
+                        <TextField margin="normal" label="Card CCV" InputProps={{readOnly: true}} fullWidth value={currentCard.ccv}/>
+                        <Button onClick={() => {setShowCardForm(false)}} variant="contained" color="error" fullWidth>Close</Button>
+                    </div>
+                </FormPopup>
+            )
         }
+
+        return (
+            <FormPopup trigger={showCardForm} setTrigger={setShowCardForm}>
+                <TextField margin="normal" label="Data name" fullWidth value={editCardValueName} onChange={(e) => {setEditCardValueName(e.target.value)}}/>
+                <TextField margin="normal" label="Card number" fullWidth value={editCardValueNumber} onChange={(e) => {setEditCardValueNumber(e.target.value)}}/>
+                <TextField margin="normal" label="Card date" fullWidth value={editCardValueDate} onChange={(e) => {setEditCardValueDate(e.target.value)}}/>
+                <TextField margin="normal" label="Card CCV" fullWidth value={editCardValueCCV} onChange={(e) => {setEditCardValueCCV(e.target.value)}}/>
+                <Stack direction="row">
+                    <Button onClick={() => {updateCard()}} sx={{margin: "3px"}} variant="contained" fullWidth color="success">Save</Button>
+                    <Button sx={{margin: "3px"}} onClick={() => {setShowCardAsEditMode(false)}} variant="contained" fullWidth color="error">Cancel</Button>
+                </Stack>
+            </FormPopup>
+        )
+    }
+
+    function RenderFormPass() {
+        if (showPassAsEditMode === false) {
+            return (
+                <FormPopup trigger={showPassForm} setTrigger={setShowPassForm}>
+                    <div onDoubleClick={handleEditPassDoubleClick}>
+                        <p>Double click on any field to enter edit mode</p>
+                        <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentPass.name}/>
+                        <TextField margin="normal" label="Website" InputProps={{readOnly: true}} fullWidth value={currentPass.url}/>
+                        <TextField margin="normal" label="Username" InputProps={{readOnly: true}} fullWidth value={currentPass.user}/>
+                        <TextField margin="normal" label="Password" InputProps={{readOnly: true}} fullWidth value={currentPass.pass}/>
+                        <Button onClick={() => {setShowPassForm(false)}} fullWidth variant="contained" color="error">Close</Button>
+                    </div>
+                </FormPopup>
+            )
+        }
+
+        return (
+            <FormPopup trigger={showPassForm} setTrigger={setShowPassForm}>
+                <TextField margin="normal" label="Data name" fullWidth value={editPassValueName} onChange={(e) => {setEditPassValueName(e.target.value)}}/>
+                <TextField margin="normal" label="Website" fullWidth value={editPassValueUrl} onChange={(e) => {setEditPassValueUrl(e.target.value)}}/>
+                <TextField margin="normal" label="Username" fullWidth value={editPassValueUser} onChange={(e) => {setEditPassValueUser(e.target.value)}}/>
+                <TextField margin="normal" label="Password" fullWidth value={editPassValuePass} onChange={(e) => {setEditPassValuePass(e.target.value)}}/>
+                <Stack direction="row">
+                    <Button onClick={() => {updatePass()}} sx={{margin: "3px"}} variant="contained" fullWidth color="success">Save</Button>
+                    <Button onClick={() => {setShowPassAsEditMode(false)}} sx={{margin: "3px"}} fullWidth variant="contained" color="error">Cancel</Button>
+                </Stack>
+            </FormPopup>
+        )
+    }
+
+    function RenderFormNote() {
+        if (showNoteAsEditMode === false) {
+            return (
+                <FormPopup trigger={showNoteForm} setTrigger={setShowNoteForm}>
+                    <div onDoubleClick={handleEditNoteDoubleClick}>
+                        <p>Double click on any field to enter edit mode</p>
+                        <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentNote.name}/>
+                        <TextField margin="normal" label="Title" InputProps={{readOnly: true}} fullWidth value={currentNote.title}/>
+                        <TextField margin="normal" multiline label="Content" InputProps={{readOnly: true}} fullWidth value={currentNote.note}/>
+                        <Button onClick={() => {setShowNoteForm(false)}} fullWidth variant="contained" color="error">Close</Button>
+                    </div>
+                </FormPopup>
+            )
+        }
+
+        return (
+            <FormPopup trigger={showNoteForm} setTrigger={setShowNoteForm}>
+                <TextField margin="normal" label="Data name" fullWidth value={editNoteValueName} onChange={(e) => {setEditNoteValueName(e.target.value)}}/>
+                <TextField margin="normal" label="Title" fullWidth value={editNoteValueTitle} onChange={(e) => {setEditNoteValueTitle(e.target.value)}}/>
+                <TextField margin="normal" multiline label="Content" fullWidth value={editNoteValueContent} onChange={(e) => {setEditNoteValueContent(e.target.value)}}/>
+                <Stack direction="row">
+                    <Button onClick={() => {updateNote()}} sx={{margin: "3px"}} variant="contained" fullWidth color="success">Save</Button>
+                    <Button onClick={() => {setShowNoteAsEditMode(false)}} sx={{margin: "3px"}} fullWidth variant="contained" color="error">Cancel</Button>
+                </Stack>
+            </FormPopup>
+        )
     }
 
     function handleGeneratePass() {
@@ -511,29 +704,9 @@ const Dashboard = () => {
                     </Box>
                 </FormPopup>
 
-                <FormPopup trigger={showCardForm} setTrigger={setShowCardForm}>
-                    <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentCard.name}/>
-                    <TextField margin="normal" label="Card number" InputProps={{readOnly: true}} fullWidth value={currentCard.number}/>
-                    <TextField margin="normal" label="Card date" InputProps={{readOnly: true}} fullWidth value={currentCard.date}/>
-                    <TextField margin="normal" label="Card CCV" InputProps={{readOnly: true}} fullWidth value={currentCard.ccv}/>
-                    <Button onClick={() => {setShowCardForm(false)}} variant="contained" color="error">Close</Button>
-                </FormPopup>
-                <FormPopup trigger={showPassForm} setTrigger={setShowPassForm}>
-                    <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentPass.name}/>
-                    <Stack direction="row">
-                        <TextField sx={{margin: 0}} label="Website" InputProps={{readOnly: true}} fullWidth value={currentPass.url}/>
-                        <Button variant="contained" sx={{marginLeft: "1em"}} onClick={handleLink}><ArrowCircleRightIcon /></Button>
-                    </Stack>
-                    <TextField margin="normal" label="Username" InputProps={{readOnly: true}} fullWidth value={currentPass.user}/>
-                    <TextField margin="normal" label="Password" InputProps={{readOnly: true}} fullWidth value={currentPass.pass}/>
-                    <Button onClick={() => {setShowPassForm(false)}} variant="contained" color="error">Close</Button>
-                </FormPopup>
-                <FormPopup trigger={showNoteForm} setTrigger={setShowNoteForm}>
-                    <TextField margin="normal" label="Data name" InputProps={{readOnly: true}} fullWidth value={currentNote.name}/>
-                    <TextField margin="normal" label="Title" InputProps={{readOnly: true}} fullWidth value={currentNote.title}/>
-                    <TextField margin="normal" multiline label="Content" InputProps={{readOnly: true}} fullWidth value={currentNote.note}/>
-                    <Button onClick={() => {setShowNoteForm(false)}} variant="contained" color="error">Close</Button>
-                </FormPopup>
+                {RenderFormCard()} {/* Called this way to avoid Component update at each subcomponent change (textfields) */}
+                {RenderFormPass()}
+                {RenderFormNote()}
             </div>
         </div>
     )
