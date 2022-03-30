@@ -110,7 +110,7 @@ const Dashboard = () => {
     const [currentFolder, setCurrentFolder] = useState(emptyFolder)
 
     async function retreiveFolders() {
-        const req = await fetch('http://localhost:4000/api/get/folders', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/get/folders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ const Dashboard = () => {
     }
 
     async function retreiveCards() {
-        const req = await fetch('http://localhost:4000/api/get/data/cards', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/get/data/cards', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ const Dashboard = () => {
     }
 
     async function retreivePass() {
-        const req = await fetch('http://localhost:4000/api/get/data/pass', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/get/data/pass', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ const Dashboard = () => {
     }
 
     async function retreiveNotes() {
-        const req = await fetch('http://localhost:4000/api/get/data/notes', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/get/data/notes', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ const Dashboard = () => {
     }
 
     async function deleteFolder() {
-        const req = await fetch('http://localhost:4000/api/remove/folder', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/remove/folder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -277,7 +277,7 @@ const Dashboard = () => {
         const number = formData.get("card_number")
         const date = formData.get("card_date")
         const ccv = formData.get("card_ccv")
-        const req = await fetch('http://localhost:4000/api/add/data/card', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/add/data/card', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ const Dashboard = () => {
         const url = formData.get("pass_url")
         const user = formData.get("pass_user")
         const pass = passwordValue
-        const req = await fetch('http://localhost:4000/api/add/data/pass', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/add/data/pass', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -347,7 +347,7 @@ const Dashboard = () => {
         const name = formData.get("note_name")
         const title = formData.get("note_title")
         const note = formData.get("note")
-        const req = await fetch('http://localhost:4000/api/add/data/note', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/add/data/note', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -370,7 +370,7 @@ const Dashboard = () => {
 
     async function addFolder(event) {
         event.preventDefault()
-        const req = await fetch('http://localhost:4000/api/add/folder', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/add/folder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -391,7 +391,7 @@ const Dashboard = () => {
     }
 
     async function updateCard() {
-        const req = await fetch('http://localhost:4000/api/edit/data/card', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/edit/data/card', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -416,7 +416,7 @@ const Dashboard = () => {
     }
 
     async function updatePass() {
-        const req = await fetch('http://localhost:4000/api/edit/data/pass', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/edit/data/pass', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -441,7 +441,7 @@ const Dashboard = () => {
     }
 
     async function updateNote() {
-        const req = await fetch('http://localhost:4000/api/edit/data/note', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/edit/data/note', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -476,7 +476,7 @@ const Dashboard = () => {
     )
 
     async function deleteCard() {
-        const req = await fetch('http://localhost:4000/api/remove/data/card', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/remove/data/card', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -496,7 +496,7 @@ const Dashboard = () => {
     }
 
     async function deletePass() {
-        const req = await fetch('http://localhost:4000/api/remove/data/pass', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/remove/data/pass', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -516,7 +516,7 @@ const Dashboard = () => {
     }
 
     async function deleteNote() {
-        const req = await fetch('http://localhost:4000/api/remove/data/note', {
+        const req = await fetch('https://datavault-iut.herokuapp.com/api/remove/data/note', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
